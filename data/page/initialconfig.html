@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Initial Configuration</title>
+    <link rel="stylesheet" type="text/css" href="../assets/css/style.css">
+    <link rel="preload" href="../assets/js/api.js" as="script">
+    <link rel="prefetch" href="../assets/js/api.js">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <div class="topnav">
+        <h1>Device Management</h1>
+    </div>
+
+    <div class="content">
+        <div class="card-grid">
+            <div class="card">
+                <p class="card-title">Initial Configuration</p>
+
+                <form id="initial-config" method="post" action="/">
+                    <div class="flex-table">
+                        <!-- Device Name -->
+                        <div class="row">
+                            <div class="label">
+                                Device Name
+                                <span class="required">*</span>
+                            </div>
+                            <div class="colon">:</div>
+                            <div class="value">
+                                <input type="text" name="device_name" required>
+                            </div>
+                            <div id="error-message" class="note"></div>
+                        </div>
+
+                        <!-- Admin Username -->
+                        <div class="row">
+                            <div class="label">
+                                Admin Username
+                                <span class="required">*</span>
+                            </div>
+                            <div class="colon">:</div>
+                            <div class="value">
+                                <input type="text" name="admin_username" required>
+                            </div>
+                            <div id="error-message" class="note"></div>
+                        </div>
+
+                        <!-- Admin Password -->
+                        <div class="row">
+                            <div class="label">
+                                Admin Password
+                                <span class="required">*</span>
+                            </div>
+                            <div class="colon">:</div>
+                            <div class="value">
+                                <input type="password" name="admin_pass" required minlength="8">
+                            </div>
+                            <div id="error-message" class="note"></div>
+                        </div>
+
+                        <!-- WiFi SSID -->
+                        <div class="row">
+                            <div class="label">
+                                WiFi SSID
+                            </div>
+                            <div class="colon">:</div>
+                            <div class="value">
+                                <input type="text" name="wifi_ssid">
+                            </div>
+                            <div id="error-message" class="note"></div>
+                        </div>
+
+                        <!-- WiFi Password -->
+                        <div class="row">
+                            <div class="label">
+                                WiFi Password
+                            </div>
+                            <div class="colon">:</div>
+                            <div class="value">
+                                <input type="password" name="wifi_pass">
+                            </div>
+                            <div id="error-message" class="note"></div>
+                        </div>
+
+                        <!-- AP SSID -->
+                        <div class="row">
+                            <div class="label">
+                                AP SSID
+                                <span class="required">*</span>
+                            </div>
+                            <div class="colon">:</div>
+                            <div class="value">
+                                <input type="text" name="ap_ssid" required>
+                            </div>
+                            <div id="error-message" class="note"></div>
+                        </div>
+
+                        <!-- AP Password -->
+                        <div class="row">
+                            <div class="label">
+                                AP Password
+                            </div>
+                            <div class="colon">:</div>
+                            <div class="value">
+                                <input type="password" name="ap_pass" minlength="8">
+                            </div>
+                            <div id="error-message" class="note"></div>
+                        </div>
+                    </div>
+                    <input type="submit" value="Submit" class="button">
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { sendRequest } from "../assets/js/api.js"
+
+        const submitButton = document.getElementById("initial-config").querySelector('input[type="submit"]');
+
+        submitButton.addEventListener('click', (event) => {
+            sendRequest(event, submitButton);
+        });
+    </script>
+</body>
+</html>

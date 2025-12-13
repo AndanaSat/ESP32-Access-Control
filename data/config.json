@@ -1,0 +1,10 @@
+{
+    "is_filled": false,
+    "device_name": "",
+    "admin_username": "",
+    "admin_pass": "",
+    "wifi_ssid": "",
+    "wifi_pass": "",
+    "ap_ssid": "ESP-32-GATE",
+    "ap_pass": ""
+}

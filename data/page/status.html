@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Device Management Status Page</title>
+    <link rel="stylesheet" type="text/css" href="../assets/css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <div class="topnav">
+        <h1>Device Management</h1>
+    </div>
+
+    <div class="content">
+        <div class="card-grid">
+            <div class="card">
+                <!--Device Details Section-->
+                <p class="card-title">Device Details</p>
+                <div class="flex-table">
+                    <div class="row">
+                        <div class="label">Name</div>
+                        <div class="colon">:</div>
+                        <div class="value">%DEVICE_NAME%</div>
+                    </div>
+                    <div class="row">
+                        <div class="label">Board</div>
+                        <div class="colon">:</div>
+                        <div class="value">NodeMCU ESP 32</div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <!--WiFi Section-->
+                <p class="card-title">WiFi</p>
+                <div class="flex-table">
+                    <div class="row">
+                        <div class="label">SSID</div>
+                        <div class="colon">:</div>
+                        <div class="value">%WIFI_SSID%</div>
+                    </div>
+                    <div class="row">
+                        <div class="label">Password</div>
+                        <div class="colon">:</div>
+                        <div class="value"><span id="wifiPass" class="password-mask">%WIFI_PASS%</span></div>
+                        <button id="wifiPassBtn" class="button-small" onclick="togglePass('wifiPass','wifiPassBtn')">Show</button>
+                    </div>
+                </div>
+
+                <hr>
+
+                <!--Access Point Section-->
+                <p class="card-title">Access Point</p>
+                <div class="flex-table">
+                    <div class="row">
+                        <div class="label">SSID</div>
+                        <div class="colon">:</div>
+                        <div class="value">%AP_SSID%</div>
+                    </div>
+                    <div class="row">
+                        <div class="label">Password</div>
+                        <div class="colon">:</div>
+                        <div class="value"><span id="apPass" class="password-mask">%AP_PASS%</span></div>
+                        <button id="apPassBtn" class="button-small" onclick="togglePass('apPass','apPassBtn')">Show</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function togglePass(textId, btnId) {
+            const text = document.getElementById(textId);
+            const btn  = document.getElementById(btnId);
+
+            if (text.classList.contains("password-mask")) {
+                text.classList.remove("password-mask");
+                btn.innerText = "Hide";
+            } else {
+                text.classList.add("password-mask");
+                btn.innerText = "Show";
+            }
+        }
+    </script>
+</body>
+</html>

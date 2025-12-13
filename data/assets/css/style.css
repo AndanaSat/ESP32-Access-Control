@@ -1,0 +1,183 @@
+/* ===== Global ===== */
+html { font-family: Arial, Helvetica, sans-serif; text-align: center; }
+body { margin: 0; }
+h1 { font-size: 30px; color: #fff; }
+p { font-size: 16px; }
+a { text-decoration: none; color: inherit; }
+form { margin-top: 20px; }
+
+/* ===== Top Bar ===== */
+.topnav { background: #0A1128; padding: 12px 0; }
+
+/* ===== Layout ===== */
+.content { padding: 5%; }
+
+.card-grid {
+    max-width: 800px;
+    margin: 0 auto;
+    display: grid;
+    gap: 2rem;
+}
+
+.card {
+    background: #fff;
+    padding: 2rem;
+    box-shadow: 2px 2px 12px rgba(140,140,140,.5);
+}
+
+.card-title {
+    font-size: 25px;
+    font-weight: bold;
+    color: #034078;
+    margin-bottom: 20px;
+}
+
+/* ===== Table Layout ===== */
+.flex-table {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+/* 3 kolom: label | colon | value | button(optional) */
+.row {
+    display: grid;
+    grid-template-columns: 150px 10px 1fr auto;
+    align-items: center;
+    gap: 6px;
+    text-align: left;
+}
+
+.label {
+    font-weight: bold;
+    color: #0A1128;
+}
+
+.colon {
+    font-weight: bold;
+    text-align: center;
+}
+
+.required {
+    color: red;
+    font-weight: bold;
+}
+
+.note {
+    grid-column: 1 / -1;
+    font-size: 14px;
+    color: red;
+    margin-top: 4px;
+}
+
+.value {
+    color: #1282A2;
+}
+
+.value input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* ===== Buttons ===== */
+button, .button, input[type=submit] {
+    border: 0;
+    border-radius: 4px;
+    padding: 15px 32px;
+    font-size: 20px;
+    color: #FEFCFB;
+    background: #034078;
+    transition: .4s;
+    cursor: pointer;
+}
+
+button:hover, .button:hover, input[type=submit]:hover {
+    background: #1282A2;
+}
+
+.button {
+    display: block;
+    margin: 20px auto;
+    width: 200px;
+}
+
+.button-loading {
+    pointer-events: none;
+    background: #858585 !important;
+    cursor: not-allowed;
+}
+
+/* Small Button (Show/Hide) */
+.button-small {
+    padding: 6px 12px;
+    font-size: 12px;
+    background: #E7E7E7;
+    color: #0A1128;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.button-small:hover {
+    background: #bdbdbd;
+}
+
+/* Password mask */
+.password-mask {
+    -webkit-text-security: disc;
+}
+
+/* ===== Mobile ===== */
+@media (max-width: 420px) {
+
+    /* Ukuran font global */
+    h1 {
+        font-size: 20px;
+    }
+
+    .card-title {
+        font-size: 16px;
+    }
+
+    .label {
+        font-size: 12px;
+    }
+
+    .colon {
+        font-size: 12px;
+    }
+
+    .note {
+        font-size: 10px;
+    }
+
+    .value {
+        font-size: 12px;
+    }
+
+    .value input {
+        font-size: 12px;
+        padding: 8px 10px;
+    }
+
+    /* Row lebih kecil */
+    .row {
+        grid-template-columns: 95px 10px 1fr auto;
+        gap: 4px;
+    }
+
+    /* Tombol lebih kecil */
+    button,
+    .button,
+    input[type=submit] {
+        padding: 12px 26px;
+        font-size: 16px;
+    }
+
+    .button {
+        width: 160px;
+    }
+}

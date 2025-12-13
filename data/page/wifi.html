@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Device Wi-Fi Manager</title>
+        <link rel="stylesheet" type="text/css" href="../assets/css/style.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <div class="topnav">
+            <h1>Device Management</h1>
+        </div>
+
+        <div class="content">
+            <div class="card-grid">
+                <div class="card">
+                    <p class="card-title">WiFi Management</p>
+                    <form id="wifi" action="/wifi" method="post">
+                        <div class="flex-table">
+                            <div class="row">
+                                <div class="label">SSID</div>
+                                <div class="colon">:</div>
+                                <div class="value">
+                                    <input type="text" name="wifi_ssid">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="label">Password</div>
+                                <div class="colon">:</div>
+                                <div class="value">
+                                    <input type="text" name="wifi_pass">
+                                </div>
+                            </div>
+                        </div>
+                        <input type="submit" value="Connect" class="button">
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script type="module">
+            import { sendRequest } from "../assets/js/sendRequest.js"
+
+            const submitButton = document.getElementById("wifi").querySelector('input[type="submit"]');
+
+            submitButton.addEventListener("click", (event) => {
+                sendRequest(event);
+            });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Device Access Point Manager</title>
+        <link rel="stylesheet" type="text/css" href="../assets/css/style.css">
+        <link rel="preload" href="../assets/js/api.js" as="script">
+        <link rel="prefetch" href="../assets/js/api.js">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <div class="topnav">
+            <h1>Device Management</h1>
+        </div>
+        <div class="content">
+            <div class="card-grid">
+                <div class="card">
+                    <p class="card-title">Access Point Management</p>
+                    <form id="accesspoint" action="/accesspoint" method="post">
+                        <div class="flex-table">
+                            <div class="row">
+                                <div class="label">SSID</div>
+                                <div class="colon">:</div>
+                                <div class="value">
+                                    <input type="text" name="ap_ssid">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="label">Password</div>
+                                <div class="colon">:</div>
+                                <div class="value">
+                                    <input type="text" name="ap_pass">
+                                </div>
+                            </div>
+                        </div>
+                        <input type="submit" value="Submit">
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script type="module">
+            import { sendRequest } from "../assets/js/api.js"
+
+            const submitButton = document.getElementById("accesspoint").querySelector('input[type="submit"]');
+
+            submitButton.addEventListener('click', async (event) => {
+                sendRequest(event, submitButton);
+            });
+        </script>
+    </body>
+</html>

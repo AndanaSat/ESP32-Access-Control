@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Device Management Name Page</title>
+    <link rel="stylesheet" type="text/css" href="../assets/css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <div class="topnav">
+        <h1>Device Management</h1>
+    </div>
+
+    <!-- Device Name Section -->
+    <div class="content">
+        <div class="card-grid">
+            <div class="card">
+                <p class="card-title">Device Name Management</p>
+                <form id="name" action="/name" method="post">
+                    <div class="flex-table">
+                        <div class="row">
+                            <div class="label">Device Name</div>
+                            <div class="colon">:</div>
+                            <div class="value">
+                                <input type="text" name="device_name" required>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="submit" value="Submit" class="button">
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reboot / Reset Section -->
+    <div class="content">
+        <div class="card-grid">
+            <div class="card">
+                <p class="card-title">Device Reboot / Reset</p>
+                <button id="button-reboot" class="button">Reboot</button>
+                <button id="button-reset" class="button">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { sendRequest, rebootDevice, resetDevice } from "../assets/js/api.js"
+        import { changeButtonToLoading } from "../assets/js/changeButton.js";
+
+        const submitButton = document.getElementById("name").querySelector('input[type="submit"]');
+        const rebootButton = document.getElementById("button-reboot");
+        const resetButton = document.getElementById("button-reset");
+
+        submitButton.addEventListener('click', (event) => {
+            sendRequest(event, submitButton);
+        });
+
+        rebootButton.addEventListener("click", rebootDevice);
+        resetButton.addEventListener("click", resetDevice);
+    </script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>ESP32 Gate</title>
+        <link rel="stylesheet" type="text/css" href="../assets/css/style.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <div class="topnav">
+            <h1>ESP32 Gate</h1>
+        </div>
+        <div class="content">
+            <p class="card-title">Press The Button To Open Gate</p>
+            <button id="button-open" class="button-open">Open</button>
+        </div>
+        <script type="module">
+            import { changeButtonToLoading } from "../assets/js/changeButton.js"
+
+            const wsGateway = `ws://${window.location.hostname}/ws`;
+            const websocket = new WebSocket(wsGateway);
+
+            const openButton = document.getElementById("button-open");
+
+            openButton.addEventListener("click", () => {
+                websocket.send("open");
+            });
+
+            websocket.onmessage = (message) => {
+                if (event.data == "open") {
+                    changeButtonToLoading(openButton, true);
+                }
+                if (event.data == "close") {
+                    changeButtonToLoading(openButton, false);
+                }
+            }       
+        </script>
+    </body>
+</html>
