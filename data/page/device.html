@@ -47,12 +47,14 @@
         import { sendRequest, rebootDevice, resetDevice } from "../assets/js/api.js"
         import { changeButtonToLoading } from "../assets/js/changeButton.js";
 
-        const submitButton = document.getElementById("name").querySelector('input[type="submit"]');
+        const form = document.getElementById("name");
+        const submitButton = form.querySelector('input[type="submit"]');
         const rebootButton = document.getElementById("button-reboot");
         const resetButton = document.getElementById("button-reset");
 
         submitButton.addEventListener('click', (event) => {
-            sendRequest(event, submitButton);
+            event.preventDefault();
+            sendRequest(form, submitButton);
         });
 
         rebootButton.addEventListener("click", rebootDevice);

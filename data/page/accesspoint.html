@@ -40,10 +40,12 @@
         <script type="module">
             import { sendRequest } from "../assets/js/api.js"
 
-            const submitButton = document.getElementById("accesspoint").querySelector('input[type="submit"]');
+            const form = document.getElementById("accesspoint");
+            const submitButton = form.querySelector('input[type="submit"]');
 
             submitButton.addEventListener('click', async (event) => {
-                sendRequest(event, submitButton);
+                event.preventDefault();
+                sendRequest(form, submitButton);
             });
         </script>
     </body>

@@ -1,9 +1,6 @@
 import { changeButtonToLoading } from "../js/changeButton.js"
 
-const sendRequest = async (event, button) => {
-    event.preventDefault();
-    
-    const form = event.target.form;
+const sendRequest = async (form, button) => {
     const formData = new FormData(form);
 
     changeButtonToLoading(button, true);
