@@ -45,7 +45,7 @@
 
     <script type="module">
         import { sendRequest, rebootDevice, resetDevice } from "../assets/js/api.js"
-        import { changeButtonToLoading } from "../assets/js/changeButton.js";
+        import { validateForm } from "../assets/js/validate.js"
 
         const form = document.getElementById("name");
         const submitButton = form.querySelector('input[type="submit"]');
@@ -54,7 +54,12 @@
 
         submitButton.addEventListener('click', (event) => {
             event.preventDefault();
-            sendRequest(form, submitButton);
+
+            let validInput = validateForm(form);
+
+            if (validInput) {
+                sendRequest(form, submitButton);
+            }
         });
 
         rebootButton.addEventListener("click", rebootDevice);

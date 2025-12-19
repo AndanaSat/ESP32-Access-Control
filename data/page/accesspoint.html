@@ -39,13 +39,19 @@
         </div>
         <script type="module">
             import { sendRequest } from "../assets/js/api.js"
+            import { validateForm } from "../assets/js/validate.js"
 
             const form = document.getElementById("accesspoint");
             const submitButton = form.querySelector('input[type="submit"]');
 
             submitButton.addEventListener('click', async (event) => {
                 event.preventDefault();
-                sendRequest(form, submitButton);
+
+                let validInput = validateForm(form);
+
+                if (validInput) {
+                    sendRequest(form, submitButton);
+                }
             });
         </script>
     </body>
