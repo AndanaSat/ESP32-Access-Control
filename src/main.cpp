@@ -2,29 +2,29 @@
 #include <WiFi.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
+#include <ESPmDNS.h>
 #include <LittleFS.h>
 #include <ArduinoJson.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
-const int relayPin = 5;
-uint8_t relayState = HIGH;
-TaskHandle_t toggleRelayHandle = NULL;
+const int RELAYPIN = 5;
+uint8_t relay_state = HIGH;
+TaskHandle_t toggle_relay_handle = NULL;
 
-const char* configPath = "/config.json";
+const char* CONFIG_PATH = "/config.json";
 
-JsonDocument jsonDoc;
+JsonDocument json_doc;
 
-class Config {
-  public:
-    bool is_filled;
-    String device_name;
-    String admin_username;
-    String admin_pass;
-    String wifi_ssid;
-    String wifi_pass;
-    String ap_ssid;
-    String ap_pass;
+struct Config {
+  bool is_filled;
+  String device_name;
+  String admin_username;
+  String admin_pass;
+  String wifi_ssid;
+  String wifi_pass;
+  String ap_ssid;
+  String ap_pass;
 };
 
 Config config;
@@ -32,17 +32,19 @@ Config config;
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 
-bool readConfig(fs::FS &fs, const char* path) {
-  Serial.printf("Reading config file in: %s\n", path);
+const char* hostname = "gate";
 
-  File file = fs.open(path, "r");
+bool readConfig(fs::FS &fs, const char* PATH) {
+  Serial.printf("Reading config file in: %s\n", PATH);
 
-  if (!file) {
+  File config_file = fs.open(PATH, "r");
+
+  if (!config_file) {
     Serial.println("Error: failed to open config file");
     return false;
   }
 
-  DeserializationError error = deserializeJson(jsonDoc, file);
+  DeserializationError error = deserializeJson(json_doc, config_file);
 
   if (error) {
     Serial.print("Error: failed to parse json ");
@@ -50,109 +52,107 @@ bool readConfig(fs::FS &fs, const char* path) {
     return false;
   }
 
-  if (!jsonDoc["is_filled"].as<bool>()){
+  if (!json_doc["is_filled"].as<bool>()){
+    config.ap_ssid        = json_doc["ap_ssid"].as<String>();
+    config.ap_pass        = json_doc["ap_pass"].as<String>();
+
     Serial.println("Config file is empty");
-
-    config.ap_ssid        = jsonDoc["ap_ssid"].as<String>();
-    config.ap_pass        = jsonDoc["ap_pass"].as<String>();
-
     return false;
-
   } else {
-    config.is_filled      = jsonDoc["is_filled"].as<bool>();
-    config.device_name    = jsonDoc["device_name"].as<String>();
-    config.admin_username = jsonDoc["admin_username"].as<String>();
-    config.admin_pass     = jsonDoc["admin_pass"].as<String>();
-    config.wifi_ssid      = jsonDoc["wifi_ssid"].as<String>();
-    config.wifi_pass      = jsonDoc["wifi_pass"].as<String>();
-    config.ap_ssid        = jsonDoc["ap_ssid"].as<String>();
-    config.ap_pass        = jsonDoc["ap_pass"].as<String>();
+    config.is_filled      = json_doc["is_filled"].as<bool>();
+    config.device_name    = json_doc["device_name"].as<String>();
+    config.admin_username = json_doc["admin_username"].as<String>();
+    config.admin_pass     = json_doc["admin_pass"].as<String>();
+    config.wifi_ssid      = json_doc["wifi_ssid"].as<String>();
+    config.wifi_pass      = json_doc["wifi_pass"].as<String>();
+    config.ap_ssid        = json_doc["ap_ssid"].as<String>();
+    config.ap_pass        = json_doc["ap_pass"].as<String>();
 
     Serial.println("Success: config file loaded");
     return true;
   }
 }
 
-bool saveConfig(fs::FS &fs, const char* path, const Config &data) {
-  Serial.printf("Saving config file in: %s\n", path);
+bool saveConfig(fs::FS &fs, const char* PATH) {
+  Serial.printf("Saving config file in: %s\n", PATH);
 
-  File file = fs.open(path, "w");
+  File config_file = fs.open(PATH, "w");
 
-  if (!file) {
+  if (!config_file) {
     Serial.println("Error: failed to open config file");
     return false;
   }
 
-  jsonDoc["is_filled"]      = data.is_filled;
-  jsonDoc["device_name"]    = data.device_name;
-  jsonDoc["admin_username"] = data.admin_username;
-  jsonDoc["admin_pass"]     = data.admin_pass;
-  jsonDoc["wifi_ssid"]      = data.wifi_ssid;
-  jsonDoc["wifi_pass"]      = data.wifi_pass;
-  jsonDoc["ap_ssid"]        = data.ap_ssid;
-  jsonDoc["ap_pass"]        = data.ap_pass;
+  json_doc["is_filled"]      = config.is_filled;
+  json_doc["device_name"]    = config.device_name;
+  json_doc["admin_username"] = config.admin_username;
+  json_doc["admin_pass"]     = config.admin_pass;
+  json_doc["wifi_ssid"]      = config.wifi_ssid;
+  json_doc["wifi_pass"]      = config.wifi_pass;
+  json_doc["ap_ssid"]        = config.ap_ssid;
+  json_doc["ap_pass"]        = config.ap_pass;
 
-  if (serializeJson(jsonDoc, file) == 0) {
+  if (serializeJson(json_doc, config_file) == 0) {
     Serial.println("Error: failed to serialize json");
-    file.close();
+    config_file.close();
     return false;
   }
 
   Serial.println("Success: config file saved");
-  file.close();
+  config_file.close();
   return true;
 }
 
-bool updateConfig(fs::FS &fs, const char* path, const char* key, const char* value) {
-  Serial.printf("Updating config file in %s\n", path);
+bool updateConfig(fs::FS &fs, const char* PATH, const char* KEY, const char* VALUE) {
+  Serial.printf("Updating config file in %s\n", PATH);
 
-  File file = fs.open(path, "w");
+  File config_file = fs.open(PATH, "w");
 
-  if (!file) {
+  if (!config_file) {
     Serial.println("Error: failed to open config file");
     return false;
   }
 
-  jsonDoc[key] = value;
+  json_doc[KEY] = VALUE;
 
-  if (serializeJson(jsonDoc, file) == 0) {
+  if (serializeJson(json_doc, config_file) == 0) {
     Serial.println("Error: failed to serialize json");
-    file.close();
+    config_file.close();
     return false;
   }
 
   Serial.println("Success: config file updated");
-  file.close();
+  config_file.close();
   return true;
 }
 
-bool resetConfig(fs::FS &fs, const char* path) {
-  Serial.printf("Resetting config file in: %s\n", path);
+bool resetConfig(fs::FS &fs, const char* PATH) {
+  Serial.printf("Resetting config file in: %s\n", PATH);
 
-  File file = fs.open(path, "w");
+  File config_file = fs.open(PATH, "w");
 
-  if (!file) {
+  if (!config_file) {
     Serial.println("Error: failed to open config file");
     return false;
   }
 
-  jsonDoc["is_filled"]      = false;
-  jsonDoc["device_name"]    = "";
-  jsonDoc["admin_username"] = "";
-  jsonDoc["admin_pass"]     = "";
-  jsonDoc["wifi_ssid"]      = "";
-  jsonDoc["wifi_pass"]      = "";
-  jsonDoc["ap_ssid"]        = "ESP-32-GATE";
-  jsonDoc["ap_pass"]        = "";
+  json_doc["is_filled"]      = false;
+  json_doc["device_name"]    = "";
+  json_doc["admin_username"] = "";
+  json_doc["admin_pass"]     = "";
+  json_doc["wifi_ssid"]      = "";
+  json_doc["wifi_pass"]      = "";
+  json_doc["ap_ssid"]        = "ESP-32-GATE";
+  json_doc["ap_pass"]        = "";
 
-  if (serializeJson(jsonDoc, file) == 0) {
+  if (serializeJson(json_doc, config_file) == 0) {
     Serial.println("Error: failed to serialize json");
-    file.close();
+    config_file.close();
     return false;
   }
 
   Serial.println("Success: config file reset");
-  file.close();
+  config_file.close();
   return true;
 }
 
@@ -183,32 +183,32 @@ void initNetworkTask(void *param) {
 }
 
 void toogleRelayTask(void *param) {
-  relayState = LOW;
-  digitalWrite(relayPin, relayState);
+  relay_state = LOW;
+  digitalWrite(RELAYPIN, relay_state);
   ws.textAll("open");
 
   vTaskDelay(pdMS_TO_TICKS(5000));
     
-  relayState = HIGH;
-  digitalWrite(relayPin, relayState);
+  relay_state = HIGH;
+  digitalWrite(RELAYPIN, relay_state);
   ws.textAll("close");
 
-  toggleRelayHandle = NULL;
+  toggle_relay_handle = NULL;
   vTaskDelete(NULL);
 }
 
-void handleWSEvent(uint8_t &relayState) {
-  if (toggleRelayHandle != NULL) {
+void handleWSEvent(uint8_t &relay_state) {
+  if (toggle_relay_handle != NULL) {
     Serial.println("Error: same task is currently being executed, please wait");
     return;
   }
-  if (relayState == LOW) {
+  if (relay_state == LOW) {
     Serial.println("Error: relay is in open state, please wait");
     return;
   }
   if (xTaskCreate(toogleRelayTask, "toogleRelayTask", 2048, NULL, 1, NULL) != pdPASS) {
     Serial.println("Error: xTaskCreate toogleRelayTask failed");
-    toggleRelayHandle = NULL;
+    toggle_relay_handle = NULL;
     return;
   }
 }
@@ -228,7 +228,7 @@ void onWSEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventTyp
       if (info->final && info->index == 0 && info->len && info->opcode == WS_TEXT) {
         data[len] = 0;
         if (strcmp((char*)data, "open") == 0) {
-          handleWSEvent(relayState);
+          handleWSEvent(relay_state);
         }
       }
       break;
@@ -263,8 +263,8 @@ String processor(const String &var) {
 void setup() {
   Serial.begin(115200);
   
-  pinMode(relayPin, OUTPUT);
-  digitalWrite(relayPin, relayState);
+  pinMode(RELAYPIN, OUTPUT);
+  digitalWrite(RELAYPIN, relay_state);
 
   // WebSocket
   ws.onEvent(onWSEvent);
@@ -276,7 +276,7 @@ void setup() {
     Serial.println("Error: failed to mount LittleFS");
   }
 
-  bool isFilled = readConfig(LittleFS, configPath);
+  bool isFilled = readConfig(LittleFS, CONFIG_PATH);
 
   initNetwork();
 
@@ -297,7 +297,7 @@ void setup() {
       config.ap_ssid         = request->getParam("ap_ssid", true)->value();
       config.ap_pass         = request->getParam("ap_pass", true)->value();
 
-      if (!saveConfig(LittleFS, configPath, config)) {
+      if (!saveConfig(LittleFS, CONFIG_PATH)) {
         request->send(400, "text/plain", "Error: please check ESP log");
         return;
       }
@@ -344,7 +344,7 @@ void setup() {
       config.ap_ssid  = request->getParam("ap_ssid", true)->value();
       config.ap_pass  = request->getParam("ap_pass", true)->value();
 
-      if (!saveConfig(LittleFS, configPath, config)) {
+      if (!saveConfig(LittleFS, CONFIG_PATH)) {
         request->send(400, "text/plain", "Error: please check ESP log");
         return;
       }
@@ -360,7 +360,7 @@ void setup() {
       config.wifi_ssid = request->getParam("wifi_ssid", true)->value();
       config.wifi_pass = request->getParam("wifi_pass", true)->value();
 
-      if (!saveConfig(LittleFS, configPath, config)) {
+      if (!saveConfig(LittleFS, CONFIG_PATH)) {
         request->send(400, "text/plain", "Error: please check ESP log");
         return;
       }
@@ -376,7 +376,7 @@ void setup() {
       config.admin_username = request->getParam("admin_username", true)->value();
       config.admin_pass     = request->getParam("admin_pass", true)->value();
 
-      if (!saveConfig(LittleFS, configPath, config)) {
+      if (!saveConfig(LittleFS, CONFIG_PATH)) {
         request->send(400, "text/plain", "Error: please check ESP log");
         return;
       }
@@ -387,7 +387,7 @@ void setup() {
     server.on("/device", HTTP_POST, [](AsyncWebServerRequest *request) {
       config.device_name = request->getParam("device_name", true)->value();
 
-      if (!saveConfig(LittleFS, configPath, config)) {
+      if (!saveConfig(LittleFS, CONFIG_PATH)) {
         request->send(400, "text/palin", "Error: please check ESP log");
         return;
       }
@@ -406,7 +406,7 @@ void setup() {
     });
 
     server.on("/reset", HTTP_POST, [](AsyncWebServerRequest *request) {
-      if (!resetConfig(LittleFS, configPath)) {
+      if (!resetConfig(LittleFS, CONFIG_PATH)) {
         request->send(400, "text/plain", "Error: please check ESP log");
         return;
       }
